@@ -253,7 +253,7 @@ public class MeiTuanSchedule {
                         "                    AND D.sku_id = F.sku_id\n" +
                         "                    AND B.app_poi_code = D.app_poi_code\n" +
                         "                    AND A.GSXX01 = E.GSXX01\n" +
-                        "                    AND D.is_sold_out = 1\n" +
+                        "                    AND D.is_sold_out = 0\n" +
                         "                    AND SUBSTR(A.CK01, LENGTH(A.CK01) - 1, 2) IN ('01', '02')\n" +
                         "                    AND A.CKSP12 IN ("+spsx+")" +
                         "                  GROUP BY A.SPXX01,\n" +
@@ -293,7 +293,7 @@ public class MeiTuanSchedule {
                         "                    AND D.sku_id = F.sku_id\n" +
                         "                    AND B.app_poi_code = D.app_poi_code\n" +
                         "                    AND A.GSXX01 = E.GSXX01\n" +
-                        "                    AND D.is_sold_out = 1\n" +
+                        "                    AND D.is_sold_out = 0\n" +
                         "                    AND SUBSTR(A.CK01, LENGTH(A.CK01) - 1, 2) IN ('01', '02')\n" +
                         "                    AND A.CKSP12 IN ("+spsx+")" +
                         "                  GROUP BY A.SPXX01,\n" +
@@ -330,7 +330,8 @@ public class MeiTuanSchedule {
                             hashMap.put("app_food_code",app_food_code);
                             hashMap.put("skus",skulist);
                             paramlist.add(hashMap);
-                            String jsonstring = JSONObject.fromObject(paramlist).toString();
+                            String jsonstring = JSONArray.fromObject(paramlist).toString();
+                            logger.info("retailSkuStock----jsonstring----"+jsonstring);
                             retailSkuStockRequest.setFood_data(jsonstring);
                             SgOpenResponse sgOpenResponse;
                             try {
