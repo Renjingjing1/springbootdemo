@@ -66,6 +66,7 @@ public class MeiTuanSchedule {
                     sgOpenResponse = poiMGetRequest.doRequest();
                 } catch (SgOpenException e) {
                     e.printStackTrace();
+                    logger.info("MeiTuanSchedule error:"+e);
                     return;
                 } catch (IOException e) {
                     e.printStackTrace();
