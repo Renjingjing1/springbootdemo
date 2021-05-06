@@ -242,10 +242,12 @@ public class MeiTuanSchedule {
     /*
      * 调用批量更新SKU库存接口
      * */
-    @Scheduled(cron = "${meituan.corn2}")
+    //@Scheduled(cron = "${meituan.corn2}")，每间隔五分钟更新一次
+    @Scheduled(fixedDelay = 5*1000*60)
     public void retailSkuStock() {
+        logger.info("更新商品库存开始。");
         //查询条件表中的条件，把对应的条件组装到查询语句中
-        String quersql = "select spsx from meituan_bm";
+        String quersql = "select DISTINCT spsx from meituan_bm";
         List<Map<String, Object>> querlist = jdbcTemplate.queryForList(quersql);
         for (Map querymap : querlist) {
             if (querymap.get("spsx") != null) {
@@ -345,6 +347,7 @@ public class MeiTuanSchedule {
                             String sku_id = map.get("sku_id") + "";
                             String app_food_code = map.get("app_food_code") + "";
                             String sl = map.get("sl") + "";
+                            logger.info("app_poi_code=="+app_poi_code+"====sku_id==="+sku_id+"====app_food_code===="+app_food_code+"====sl==="+sl+"====list.size="+list.size());
                             //组建请求参数,如有其它参数请补充完整
                             RetailSkuStockRequest retailSkuStockRequest = new RetailSkuStockRequest(systemParam);
                             retailSkuStockRequest.setApp_poi_code(app_poi_code);
@@ -359,7 +362,7 @@ public class MeiTuanSchedule {
                             hashMap.put("skus", skulist);
                             paramlist.add(hashMap);
                             String jsonstring = JSONArray.fromObject(paramlist).toString();
-                            logger.info("retailSkuStock----jsonstring----" + jsonstring);
+                            //logger.info("retailSkuStock----jsonstring----" + jsonstring);
                             retailSkuStockRequest.setFood_data(jsonstring);
                             SgOpenResponse sgOpenResponse;
                             try {
@@ -375,18 +378,23 @@ public class MeiTuanSchedule {
                             String requestSig = sgOpenResponse.getRequestSig();
                             //请求返回的结果，按照官网的接口文档自行解析即可
                             String requestResult = sgOpenResponse.getRequestResult();
-                            JSONObject jsonObject = JSONObject.fromObject(requestResult);
-                            String data = jsonObject.getString("data");
-                            if ("ok".equalsIgnoreCase(data)) {
-                                logger.info("更新成功 :requestSig:" + requestSig);
-                            } else {
-                                logger.info("更新失败 :requestSig:" + requestSig + "-----" + jsonObject);
+                            if(requestResult.startsWith("{") && requestResult.endsWith("}")){
+                                JSONObject jsonObject = JSONObject.fromObject(requestResult);
+                                String data = jsonObject.getString("data");
+                                if ("ok".equalsIgnoreCase(data)) {
+                                    logger.info("更新成功 :requestSig:" + requestSig);
+                                } else {
+                                    logger.info("更新失败 :requestSig:" + requestSig + "-----" + jsonObject);
+                                }
+                            }else {
+                                logger.info("requestResult========"+requestResult);
                             }
                         }
                     }
                 }
             }
         }
+        logger.info("更新商品库存完成。");
     }
 
     /*
